@@ -1,23 +1,23 @@
 {
-  "name": "",
-  "version": "",
+  "name": "KeyKeeper",
+  "version": "0.0.1",
   "author": "Valerii Shandin <shandin.va@gmail.com>",
-  "license": "",
-  "description": "",
-  "keywords": [],
-  "main": "",
-  "types": "",
-  "files": [],
+  "license": "MIT",
+  "description": "Lightweight Node.js package designed to safeguard secrets.",
+  "keywords": ["keykeeper", "vault", "key", "secret"],
+  "main": "keykeeper.js",
+  "types": "keykeeper.d.ts",
+  "files": ["lib/", "keykeeper.d.ts"],
   "engines": {
     "node": "20"
   },
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/Shandin17/keykeeper"
   },
   "bugs": {
     "email": "shandin.va@gmail.com",
-    "url": ""
+    "url": "https://github.com/Shandin17/keykeeper/issues"
   },
   "scripts": {
     "test": "npm run lint && npm run types && tap run",
@@ -35,5 +35,8 @@
     "prettier": "^3.2.5",
     "tap": "^18.7.0",
     "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "metautil": "^5.2.0"
   }
 }
