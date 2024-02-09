@@ -56,28 +56,30 @@ export declare const ErrorCodes: {
   WRONG_USER_ID: string;
 };
 
-/**
- * The encryption algorithm used for encrypting and decrypting data with 256-bit master key.
- *
- */
-export declare const holdCryptoAlgorithm = 'aes-256-cbc';
+export declare const CryptoConstants: {
+  /**
+   * The encryption algorithm used for encrypting and decrypting data with 256-bit master key.
+   *
+   */
+  holdCryptoAlgorithm: 'aes-256-cbc';
 
-/**
- * The number of iterations for the PBKDF2 algorithm.
- */
-export declare const pinToKeyIterations = 100_000;
+  /**
+   * The number of iterations for the PBKDF2 algorithm.
+   */
+  pinToKeyIterations: 100_000;
 
-/**
- * The algorithm used for digesting a PIN to generate a key.
- */
-export declare const pinToKeyDigest = 'sha256';
+  /**
+   * The algorithm used for digesting a PIN to generate a key.
+   */
+  pinToKeyDigest: 'sha256';
 
-/**
- * The length of a key in bytes.
- */
-export declare const keyLength = 32;
+  /**
+   * The length of a key in bytes.
+   */
+  keyLength: 32;
 
-/**
- * The length of the salt in bytes.
- */
-export declare const saltLength = 16;
+  /**
+   * The length of the salt in bytes.
+   */
+  saltLength: 16;
+};
