@@ -4,12 +4,12 @@
   "author": "Valerii Shandin <shandin.va@gmail.com>",
   "license": "MIT",
   "description": "Lightweight Node.js package designed to safeguard secrets.",
-  "keywords": ["keykeeper", "vault", "key", "secret"],
+  "keywords": ["keykeeper", "vault", "key", "secret", "secretkeeper"],
   "main": "keykeeper.js",
   "types": "keykeeper.d.ts",
   "files": ["lib/", "keykeeper.d.ts"],
   "engines": {
-    "node": "20"
+    "node": "18 || 20 || 21"
   },
   "repository": {
     "type": "git",
