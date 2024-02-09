@@ -125,3 +125,31 @@ test('should save objects in different encodings', async ({ equal }) => {
     await kk.cleanCache();
   }
 });
+
+test('change pin throw if unknown userId', async ({ equal }) => {
+  let error;
+  try {
+    await keyKeeper.changePin({
+      userId: 99999999,
+      oldPin: pin,
+      newPin: 'new_pin',
+    });
+  } catch (e) {
+    error = e;
+  }
+  equal(error.code, ErrorCodes.WRONG_USER_ID);
+});
+
+test('change pin throw if wrong old pin provided', async ({ equal }) => {
+  let error;
+  try {
+    await keyKeeper.changePin({
+      userId,
+      oldPin: 'wrong_old_pin',
+      newPin: 'new_pin',
+    });
+  } catch (e) {
+    error = e;
+  }
+  equal(error.code, ErrorCodes.WRONG_PIN);
+});
