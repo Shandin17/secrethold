@@ -33,7 +33,7 @@ export interface ChangePinOptions {
   newPin: string;
 }
 
-export interface KeyKeeperOptions {
+export interface SecretHoldOptions {
   masterKey: Buffer;
   encryptedStorage?: EncryptedStorage;
   cache?: Cache;
@@ -42,8 +42,8 @@ export interface KeyKeeperOptions {
   secretEncoding?: 'utf8' | 'base64' | 'base64url' | 'hex';
 }
 
-export class KeyKeeper {
-  constructor(keyKeeperOptions: KeyKeeperOptions);
+export class SecretHold {
+  constructor(secretHoldOptions: SecretHoldOptions);
   getSecret<T>(userId: UserId, pin: string): Promise<T | null>;
   changePin(changePinOptions: ChangePinOptions): Promise<void>;
   setSecret(setSecretOptions: SetSecretOptions, tx?: unknown | null): Promise<void>;

@@ -1,23 +1,23 @@
 {
-  "name": "keykeeper",
+  "name": "secrethold",
   "version": "0.0.1",
   "author": "Valerii Shandin <shandin.va@gmail.com>",
   "license": "MIT",
   "description": "Lightweight Node.js package designed to safeguard secrets.",
-  "keywords": ["keykeeper", "vault", "key", "secret", "secretkeeper"],
-  "main": "keykeeper.js",
-  "types": "keykeeper.d.ts",
-  "files": ["lib/", "keykeeper.d.ts"],
+  "keywords": ["key", "secret", "holder", "secretholder", "secrethold", "stronghold"],
+  "main": "secrethold.js",
+  "types": "secrethold.d.ts",
+  "files": ["lib/", "secrethold.d.ts"],
   "engines": {
     "node": "18 || 20 || 21"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Shandin17/keykeeper"
+    "url": "git+https://github.com/Shandin17/secrethold"
   },
   "bugs": {
     "email": "shandin.va@gmail.com",
-    "url": "https://github.com/Shandin17/keykeeper/issues"
+    "url": "https://github.com/Shandin17/secrethold/issues"
   },
   "scripts": {
     "test": "npm run lint && npm run types && tap run",
