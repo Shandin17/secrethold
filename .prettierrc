@@ -1,6 +1,8 @@
 {
   "singleQuote": true,
   "trailingComma": "all",
+  "printWidth": 100,
+  "semi": true,
   "overrides": [
     {
       "files": ["**/.*rc", "**/*.json"],
