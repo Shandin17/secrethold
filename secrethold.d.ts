@@ -38,7 +38,7 @@ export interface SecretHoldOptions {
   encryptedStorage?: EncryptedStorage;
   cache?: Cache;
   cacheTimeMs?: number;
-  secretWrapper?: <T>(secret: string) => Promise<T>;
+  secretWrapper?: <T>(secret: string) => Promise<T> | T;
   secretEncoding?: 'utf8' | 'base64' | 'base64url' | 'hex';
 }
 
@@ -80,4 +80,4 @@ export declare const keyLength = 32;
 /**
  * The length of the salt in bytes.
  */
-export const saltLength = 16;
+export declare const saltLength = 16;
