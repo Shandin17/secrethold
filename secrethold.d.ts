@@ -38,7 +38,7 @@ export interface SecretHoldOptions<T> {
   encryptedStorage?: EncryptedStorage;
   cache?: Cache;
   cacheTimeMs?: number;
-  secretWrapper?: (secret: string) => Promise<T> | T; // todo: fix type
+  secretWrapper?: (secret: string) => Promise<T> | T;
   secretEncoding?: 'utf8' | 'base64' | 'base64url' | 'hex';
 }
 
