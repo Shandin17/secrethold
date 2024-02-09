@@ -1,6 +1,6 @@
 {
   "name": "secrethold",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "Valerii Shandin <shandin.va@gmail.com>",
   "license": "MIT",
   "description": "Lightweight Node.js package designed to safeguard secrets.",

@@ -76,6 +76,7 @@ test('should return wrapped secret', async ({ same }) => {
   const secretHoldWithWrapper = new SecretHold({
     masterKey,
     secretWrapper,
+    cacheTimeMs: 0,
   });
   await secretHoldWithWrapper.setSecret({ userId, decryptedSecret: secret, pin });
   const wrappedSecret = await secretHoldWithWrapper.getSecret(userId, pin);
@@ -110,19 +111,20 @@ test('should save objects in different encodings', async ({ equal }) => {
   for (const secretEncoding of encodings) {
     const masterKey = crypto.randomBytes(32);
     const decryptedSecret = crypto.randomBytes(32).toString(secretEncoding);
-    const kk = new SecretHold({
+    const sh = new SecretHold({
       masterKey,
       secretEncoding,
+      cacheTimeMs: 0,
     });
-    await kk.setSecret({
+    await sh.setSecret({
       userId,
       decryptedSecret,
       pin,
     });
     await delay(1);
-    const secretFromKK = await kk.getSecret(userId, pin);
+    const secretFromKK = await sh.getSecret(userId, pin);
     equal(secretFromKK, decryptedSecret);
-    await kk.cleanCache();
+    await sh.cleanCache();
   }
 });
 
@@ -152,4 +154,17 @@ test('change pin throw if wrong old pin provided', async ({ equal }) => {
     error = e;
   }
   equal(error.code, ErrorCodes.WRONG_PIN);
+});
+
+test('pin can be any utf8 string', async ({ equal }) => {
+  const secretMessage = 'secret message';
+  const pin = 'qwerty123';
+  await secrethold.setSecret({
+    userId,
+    pin,
+    decryptedSecret: secretMessage,
+  });
+  await delay(1);
+  const received = await secrethold.getSecret(userId, pin);
+  equal(secretMessage, received);
 });
