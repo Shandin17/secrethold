@@ -33,18 +33,18 @@ export interface ChangePinOptions {
   newPin: string;
 }
 
-export interface SecretHoldOptions {
+export interface SecretHoldOptions<T> {
   masterKey: Buffer;
   encryptedStorage?: EncryptedStorage;
   cache?: Cache;
   cacheTimeMs?: number;
-  secretWrapper?: <T>(secret: string) => Promise<T> | T;
+  secretWrapper?: (secret: string) => Promise<T> | T; // todo: fix type
   secretEncoding?: 'utf8' | 'base64' | 'base64url' | 'hex';
 }
 
-export class SecretHold {
-  constructor(secretHoldOptions: SecretHoldOptions);
-  getSecret<T>(userId: UserId, pin: string): Promise<T | null>;
+export class SecretHold<T> {
+  constructor(secretHoldOptions: SecretHoldOptions<T>);
+  getSecret(userId: UserId, pin: string): Promise<T | null>;
   changePin(changePinOptions: ChangePinOptions): Promise<void>;
   setSecret(setSecretOptions: SetSecretOptions, tx?: unknown | null): Promise<void>;
   cleanCache(): Promise<void>;
