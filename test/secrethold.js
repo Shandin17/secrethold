@@ -8,7 +8,7 @@ const { decrypt } = require('../lib/cryptography/decrypt');
 
 const secret = 'secret message';
 const masterKey = crypto.randomBytes(32);
-const userId = 12345678;
+const id = 12345678;
 const pin = '123456abcdef';
 
 const secrethold = new SecretHold({
@@ -21,25 +21,25 @@ test('constructor', async (t) => {
 });
 
 test('should provide set and get methods', async (t) => {
-  await secrethold.setSecret({ userId, decryptedSecret: secret, pin });
-  const saved = await secrethold.getSecret(userId, pin);
-  t.ok(await secrethold.cached(userId.toString()));
+  await secrethold.setSecret({ id, decryptedSecret: secret, pin });
+  const saved = await secrethold.getSecret(id, pin);
+  t.ok(await secrethold.cached(id.toString()));
   t.not(saved, null);
   t.same(saved, secret);
 });
 
 test('should fetch data from encryptedStorage after cache cleaned', async (t) => {
-  await secrethold.setSecret({ userId, decryptedSecret: secret, pin });
+  await secrethold.setSecret({ id, decryptedSecret: secret, pin });
   await delay(1);
-  t.equal(await secrethold.cached(userId.toString()), false);
-  const saved = await secrethold.getSecret(userId, pin);
+  t.equal(await secrethold.cached(id.toString()), false);
+  const saved = await secrethold.getSecret(id, pin);
   t.not(saved, null);
   t.same(saved, secret);
 });
 
-test('getSecret with invalid userId', async (t) => {
-  const userId = 1234;
-  const secret = await secrethold.getSecret(userId, pin);
+test('getSecret with invalid id', async (t) => {
+  const id = 1234;
+  const secret = await secrethold.getSecret(id, pin);
   t.equal(secret, null);
 });
 
@@ -47,9 +47,9 @@ test('getAccount with invalid pin', async (t) => {
   const invalidPin = 'invalidPin';
   let error;
   try {
-    await secrethold.setSecret({ userId, decryptedSecret: secret, pin });
+    await secrethold.setSecret({ id, decryptedSecret: secret, pin });
     await delay(1);
-    await secrethold.getSecret(userId, invalidPin);
+    await secrethold.getSecret(id, invalidPin);
   } catch (e) {
     error = e;
   }
@@ -58,14 +58,14 @@ test('getAccount with invalid pin', async (t) => {
 
 test(`set new pin`, async ({ same }) => {
   const newPin = 'new_pin';
-  await secrethold.setSecret({ userId, decryptedSecret: secret, pin });
-  const secretFromOldKey = await secrethold.getSecret(userId, pin);
+  await secrethold.setSecret({ id, decryptedSecret: secret, pin });
+  const secretFromOldKey = await secrethold.getSecret(id, pin);
   await secrethold.changePin({
-    userId,
+    id,
     oldPin: pin,
     newPin,
   });
-  const secretFromNewPing = await secrethold.getSecret(userId, newPin);
+  const secretFromNewPing = await secrethold.getSecret(id, newPin);
   same(secretFromOldKey, secretFromNewPing);
 });
 
@@ -78,8 +78,8 @@ test('should return wrapped secret', async ({ same }) => {
     secretWrapper,
     cacheTimeMs: 0,
   });
-  await secretHoldWithWrapper.setSecret({ userId, decryptedSecret: secret, pin });
-  const wrappedSecret = await secretHoldWithWrapper.getSecret(userId, pin);
+  await secretHoldWithWrapper.setSecret({ id, decryptedSecret: secret, pin });
+  const wrappedSecret = await secretHoldWithWrapper.getSecret(id, pin);
   same(secretWrapper(secret), wrappedSecret);
   await secretHoldWithWrapper.cleanCache();
 });
@@ -87,14 +87,14 @@ test('should return wrapped secret', async ({ same }) => {
 test('should wrap operation into transaction', async ({ equal }) => {
   let savedData;
   const mockedTxClient = {
-    set: (userId, encryptedData) => {
+    set: (id, encryptedData) => {
       savedData = encryptedData;
     },
   };
   // saving encrypted secret to savedData
   await secrethold.setSecret(
     {
-      userId,
+      id,
       decryptedSecret: secret,
       pin,
     },
@@ -102,7 +102,7 @@ test('should wrap operation into transaction', async ({ equal }) => {
   );
   const decryptedSavedData = await decrypt(savedData, masterKey, pin, 'utf8');
   await delay(1);
-  const secretFromKK = await secrethold.getSecret(userId, pin);
+  const secretFromKK = await secrethold.getSecret(id, pin);
   equal(decryptedSavedData, secretFromKK);
 });
 
@@ -117,36 +117,36 @@ test('should save objects in different encodings', async ({ equal }) => {
       cacheTimeMs: 0,
     });
     await sh.setSecret({
-      userId,
+      id,
       decryptedSecret,
       pin,
     });
     await delay(1);
-    const secretFromKK = await sh.getSecret(userId, pin);
+    const secretFromKK = await sh.getSecret(id, pin);
     equal(secretFromKK, decryptedSecret);
     await sh.cleanCache();
   }
 });
 
-test('change pin throw if unknown userId', async ({ equal }) => {
+test('change pin throw if unknown id', async ({ equal }) => {
   let error;
   try {
     await secrethold.changePin({
-      userId: 99999999,
+      id: 99999999,
       oldPin: pin,
       newPin: 'new_pin',
     });
   } catch (e) {
     error = e;
   }
-  equal(error.code, ErrorCodes.WRONG_USER_ID);
+  equal(error.code, ErrorCodes.WRONG_ID);
 });
 
 test('change pin throw if wrong old pin provided', async ({ equal }) => {
   let error;
   try {
     await secrethold.changePin({
-      userId,
+      id,
       oldPin: 'wrong_old_pin',
       newPin: 'new_pin',
     });
@@ -160,11 +160,11 @@ test('pin can be any utf8 string', async ({ equal }) => {
   const secretMessage = 'secret message';
   const pin = 'qwerty123';
   await secrethold.setSecret({
-    userId,
+    id,
     pin,
     decryptedSecret: secretMessage,
   });
   await delay(1);
-  const received = await secrethold.getSecret(userId, pin);
+  const received = await secrethold.getSecret(id, pin);
   equal(secretMessage, received);
 });

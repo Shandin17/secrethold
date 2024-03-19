@@ -1,4 +1,4 @@
-export type UserId = number | bigint;
+export type Id = number | bigint | string;
 export type pinSalt = string;
 export type aesSalt = string;
 export type EncryptedData = `${pinSalt}:${aesSalt}:${string}`;
@@ -13,22 +13,18 @@ export interface Cache {
 }
 
 export interface EncryptedStorage {
-  getEncryptedData: (userId: UserId) => Promise<EncryptedData | null>;
-  setEncryptedData: (
-    userId: UserId,
-    encryptedKey: EncryptedData,
-    tx?: unknown | null,
-  ) => Promise<void>;
+  getEncryptedData: (id: Id) => Promise<EncryptedData | null>;
+  setEncryptedData: (id: Id, encryptedKey: EncryptedData, tx?: unknown | null) => Promise<void>;
 }
 
 export interface SetSecretOptions {
-  userId: UserId;
+  id: Id;
   decryptedSecret: unknown;
   pin: string;
 }
 
 export interface ChangePinOptions {
-  userId: number;
+  id: Id;
   oldPin: string;
   newPin: string;
 }
@@ -44,7 +40,7 @@ export interface SecretHoldOptions<T> {
 
 export class SecretHold<T> {
   constructor(secretHoldOptions: SecretHoldOptions<T>);
-  getSecret(userId: UserId, pin: string): Promise<T | null>;
+  getSecret(id: Id, pin: string): Promise<T | null>;
   changePin(changePinOptions: ChangePinOptions): Promise<void>;
   setSecret(setSecretOptions: SetSecretOptions, tx?: unknown | null): Promise<void>;
   cleanCache(): Promise<void>;
@@ -53,7 +49,7 @@ export class SecretHold<T> {
 
 export declare const ErrorCodes: {
   WRONG_PIN: string;
-  WRONG_USER_ID: string;
+  WRONG_ID: string;
 };
 
 export declare const CryptoConstants: {
