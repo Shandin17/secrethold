@@ -10,6 +10,7 @@ export interface Cache {
   set: (key: CacheKey, val: CacheValue, ms?: number) => Promise<void>;
   buildKey: (...args: CacheKey[]) => CacheKey;
   cached: (key: CacheKey) => Promise<boolean>;
+  del: (key: CacheKey) => Promise<void>;
 }
 
 export interface EncryptedStorage {
@@ -44,7 +45,8 @@ export class SecretHold<T> {
   changePin(changePinOptions: ChangePinOptions, tx?: unknown | null): Promise<void>;
   setSecret(setSecretOptions: SetSecretOptions, tx?: unknown | null): Promise<void>;
   cleanCache(): Promise<void>;
-  cached(key: CacheKey): Promise<boolean>;
+  deleteCachedSecret(id: Id): Promise<void>;
+  cached(id: Id): Promise<boolean>;
 }
 
 export declare const ErrorCodes: {

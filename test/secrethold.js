@@ -194,3 +194,17 @@ test('pin can be any utf8 string', async ({ equal }) => {
   const received = await secrethold.getSecret(id, pin);
   equal(secretMessage, received);
 });
+
+test('should clear cached secret', async ({ equal }) => {
+  const secrethold = new SecretHold({
+    masterKey,
+  });
+  await secrethold.setSecret({
+    id,
+    decryptedSecret: secret,
+    pin,
+  });
+  equal(await secrethold.cached(id), true);
+  await secrethold.deleteCachedSecret(id);
+  equal(await secrethold.cached(id), false);
+});
