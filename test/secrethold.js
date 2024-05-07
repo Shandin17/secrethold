@@ -69,6 +69,32 @@ test(`set new pin`, async ({ same }) => {
   same(secretFromOldKey, secretFromNewPing);
 });
 
+test('should wrap setting new pin into transaction', async ({ equal }) => {
+  await secrethold.setSecret({
+    id,
+    decryptedSecret: secret,
+    pin,
+  });
+  const newPin = 'new_pin';
+  let savedData;
+  const mockedTxClient = {
+    set: (id, encryptedData) => {
+      savedData = encryptedData;
+    },
+  };
+  await secrethold.changePin(
+    {
+      id,
+      oldPin: pin,
+      newPin,
+    },
+    mockedTxClient,
+  );
+  const decryptedDataWithNewPin = await secrethold.getSecret(id, newPin);
+  const decryptedSavedData = await decrypt(savedData, masterKey, newPin, 'utf8');
+  equal(decryptedDataWithNewPin, decryptedSavedData);
+});
+
 test('should return wrapped secret', async ({ same }) => {
   const secretWrapper = (secret) => ({
     secret,

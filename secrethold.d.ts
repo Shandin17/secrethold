@@ -41,7 +41,7 @@ export interface SecretHoldOptions<T> {
 export class SecretHold<T> {
   constructor(secretHoldOptions: SecretHoldOptions<T>);
   getSecret(id: Id, pin: string): Promise<T | null>;
-  changePin(changePinOptions: ChangePinOptions): Promise<void>;
+  changePin(changePinOptions: ChangePinOptions, tx?: unknown | null): Promise<void>;
   setSecret(setSecretOptions: SetSecretOptions, tx?: unknown | null): Promise<void>;
   cleanCache(): Promise<void>;
   cached(key: CacheKey): Promise<boolean>;
