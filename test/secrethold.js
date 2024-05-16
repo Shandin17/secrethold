@@ -208,3 +208,40 @@ test('should clear cached secret', async ({ equal }) => {
   await secrethold.deleteCachedSecret(id);
   equal(await secrethold.cached(id), false);
 });
+
+test('should delete secret', async ({ equal }) => {
+  const secrethold = new SecretHold({
+    masterKey,
+  });
+  await secrethold.setSecret({
+    id,
+    decryptedSecret: secret,
+    pin,
+  });
+  await secrethold.delSecret(id);
+  equal(await secrethold.cached(id), false);
+  equal(await secrethold.getSecret(id, pin), null);
+});
+
+test('should wrap delete in transaction', async ({ equal }) => {
+  let savedData;
+  const mockedTxClient = {
+    set: (id, encryptedData) => {
+      savedData = encryptedData;
+    },
+    del: () => {
+      savedData = null;
+    },
+  };
+  // saving encrypted secret to savedData
+  await secrethold.setSecret(
+    {
+      id,
+      decryptedSecret: secret,
+      pin,
+    },
+    mockedTxClient,
+  );
+  await secrethold.delSecret(id, mockedTxClient);
+  equal(savedData, null);
+});

@@ -16,6 +16,7 @@ export interface Cache {
 export interface EncryptedStorage {
   getEncryptedData: (id: Id) => Promise<EncryptedData | null>;
   setEncryptedData: (id: Id, encryptedKey: EncryptedData, tx?: unknown | null) => Promise<void>;
+  delEncryptedData: (id: Id, tx?: unknown | null) => Promise<void>;
 }
 
 export interface SetSecretOptions {
@@ -47,6 +48,7 @@ export class SecretHold<T> {
   cleanCache(): Promise<void>;
   deleteCachedSecret(id: Id): Promise<void>;
   cached(id: Id): Promise<boolean>;
+  delSecret(id: Id, tx?: unknown | null): Promise<void>;
 }
 
 export declare const ErrorCodes: {
