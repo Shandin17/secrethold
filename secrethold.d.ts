@@ -40,7 +40,7 @@ export interface SecretHoldOptions<T> {
   secretEncoding?: 'utf8' | 'base64' | 'base64url' | 'hex';
 }
 
-export class SecretHold<T> {
+export class SecretHold<T = string> {
   constructor(secretHoldOptions: SecretHoldOptions<T>);
   getSecret(id: Id, pin: string): Promise<T | null>;
   changePin(changePinOptions: ChangePinOptions, tx?: unknown | null): Promise<void>;
