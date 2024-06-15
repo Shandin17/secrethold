@@ -150,6 +150,14 @@ test('should save objects in different encodings', async ({ equal }) => {
     await delay(1);
     const secretFromKK = await sh.getSecret(id, pin);
     equal(secretFromKK, decryptedSecret);
+    const newPin = 'new_pin';
+    await sh.changePin({
+      id,
+      oldPin: pin,
+      newPin,
+    });
+    const secretFromNewPin = await sh.getSecret(id, newPin);
+    equal(secretFromNewPin, secretFromKK);
     await sh.cleanCache();
   }
 });
