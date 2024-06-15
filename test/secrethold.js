@@ -190,6 +190,32 @@ test('change pin throw if wrong old pin provided', async ({ equal }) => {
   equal(error.code, ErrorCodes.WRONG_PIN);
 });
 
+test('change pin throw if secretWrapper throws', async ({ rejects }) => {
+  const secretWrapper = () => {
+    throw new Error('wrapper error');
+  };
+  const secrethold = new SecretHold({
+    masterKey,
+    secretWrapper,
+    cacheTimeMs: 0,
+  });
+  await secrethold.setSecret({
+    id,
+    decryptedSecret: secret,
+    pin,
+  });
+  await rejects(
+    secrethold.changePin({
+      id,
+      oldPin: pin,
+      newPin: 'new_pin',
+    }),
+    {
+      code: ErrorCodes.WRONG_PIN,
+    },
+  );
+});
+
 test('pin can be any utf8 string', async ({ equal }) => {
   const secretMessage = 'secret message';
   const pin = 'qwerty123';
