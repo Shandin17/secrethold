@@ -4,7 +4,8 @@
 
 ## [2.1.0][] - 2024-06-19
 
-- cache removed. Now `Secrehold` always reads data from persistent encrypted storage
+- cache removed. Now `Secrethold` always reads data from persistent encrypted storage
+- The Secrethold class now includes the `createEncryptionStream` and `createDecryptionStream` functions. These allow you to establish streams for encrypting and decrypting substantial amounts of data. Please note, if you choose to use these methods for encryption, you are responsible for ensuring the encrypted data is saved to a persistent storage.
 
 ## [2.0.0][] - 2024-06-19
 
@@ -19,4 +20,4 @@
 ### fixes
 
 - imports for esm modules fix
-- `SecretHold.changePin` fixed. Now, after the secret is decrypted using old pin, an additional data verification step is performed by the `secretWrapper` (if it is provided) to avoid data corruption. Also secrets encodings are now checked.
+- `SecretHold.changePin` fixed. Now, after the secret is decrypted using old pin, an additional data verification step is performed by the `secretWrapper` (if it is provided) to avoid data corruption. Also, secrets encodings are now checked.
