@@ -1,11 +1,11 @@
 'use strict';
 
-const SecretHold = require('./lib');
+const Secrethold = require('./lib');
 const ErrorCodes = require('./lib/errors');
 const CryptoConstants = require('./lib/cryptography/constants');
 
 module.exports = {
-  SecretHold,
+  Secrethold,
   ErrorCodes,
   CryptoConstants,
 };
