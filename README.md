@@ -1,4 +1,4 @@
-# SecretHold
+# Secrethold
 
 [![NPM version](https://img.shields.io/npm/v/secrethold.svg?style=flat)](https://www.npmjs.com/package/secrethold)
 [![ci status](https://github.com/Shandin17/secrethold/workflows/Testing%20CI/badge.svg)](https://github.com/Shandin17/secrethold/actions/workflows/test.yml)
