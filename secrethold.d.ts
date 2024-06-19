@@ -26,8 +26,6 @@ export interface ChangePinOptions {
   newPin: string;
 }
 
-
-
 /**
  * SecretholdOptions interface represents the options for a Secrethold instance.
  *
@@ -169,7 +167,6 @@ export declare const ErrorCodes: {
    */
   WRONG_ID: string;
 };
-
 
 export declare const CryptoConstants: {
   /**
