@@ -1,9 +1,12 @@
+import type { Readable } from 'node:stream';
+import type { CipherGCM } from 'node:crypto';
+
 export type Id = number | bigint | string;
 export type PinSalt = string;
-export type AesSalt = string;
+export type Iv = string;
 export type MasterTag = string;
 export type PinTag = string;
-export type EncryptedData = `${PinSalt}:${AesSalt}:${MasterTag}:${PinTag}:${string}`;
+export type EncryptedData = `${PinSalt}:${Iv}:${MasterTag}:${PinTag}:${string}`;
 
 export interface EncryptedStorage {
   getEncryptedData: (id: Id) => Promise<EncryptedData | null>;
@@ -31,12 +34,42 @@ export interface SecretholdOptions<T> {
   encryptedDataEncoding?: BufferEncoding;
 }
 
+export interface CreateEncryptionStreamOptions {
+  source: Readable;
+  pin: string;
+}
+
+export interface CreateEncryptionStreamResult {
+  pinTagPromise: Promise<PinTag>;
+  masterTagPromise: Promise<MasterTag>;
+  encryptedStream: CipherGCM;
+  iv: Iv;
+  pinSalt: PinSalt;
+}
+
+export interface CreateDecryptionStreamOptions {
+  encryptedSource: CipherGCM | Readable;
+  pin: string;
+  pinSalt: PinSalt | Buffer;
+  iv: Iv | Buffer;
+  masterTag: MasterTag | Buffer;
+  pinTag: PinTag | Buffer;
+}
+
+export type CreateDecryptionStreamResult = Readable;
+
 export class Secrethold<T = string> {
   constructor(secretholdOptions: SecretholdOptions<T>);
   getSecret(id: Id, pin: string): Promise<T | null>;
   changePin(changePinOptions: ChangePinOptions, tx?: unknown | null): Promise<void>;
   setSecret(setSecretOptions: SetSecretOptions, tx?: unknown | null): Promise<void>;
   delSecret(id: Id, tx?: unknown | null): Promise<void>;
+  createEncryptionStream(
+    opts: CreateEncryptionStreamOptions,
+  ): Promise<CreateEncryptionStreamResult>;
+  createDecryptionStream(
+    opts: CreateDecryptionStreamOptions,
+  ): Promise<CreateDecryptionStreamResult>;
 }
 
 export declare const ErrorCodes: {
@@ -49,7 +82,7 @@ export declare const CryptoConstants: {
    * The encryption algorithm used for encrypting and decrypting data with 256-bit master key.
    *
    */
-  holdCryptoAlgorithm: 'aes-256-cbc';
+  holdCryptoAlgorithm: 'aes-256-gcm';
 
   /**
    * The number of iterations for the PBKDF2 algorithm.
@@ -69,5 +102,5 @@ export declare const CryptoConstants: {
   /**
    * The length of the salt in bytes.
    */
-  saltLength: 16;
+  saltLength: 12;
 };

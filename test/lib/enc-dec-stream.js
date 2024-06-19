@@ -3,7 +3,7 @@
 const { test } = require('tap');
 const stream = require('node:stream');
 const crypto = require('node:crypto');
-const { encrypt: encDecStream } = require('../../lib/cryptography/encrypt');
+const { encrypt } = require('../../lib/cryptography/encrypt');
 const { CryptoConstants } = require('../../');
 const { decrypt } = require('../../lib/cryptography/decrypt');
 
@@ -24,7 +24,7 @@ test('encryption function should work with readable stream', async ({ equal }) =
   const pin = '123456';
 
   // encrypting
-  const { pinTagPromise, masterTagPromise, encryptedStream } = await encDecStream({
+  const { pinTagPromise, masterTagPromise, encryptedStream } = await encrypt({
     source,
     masterKey,
     iv,

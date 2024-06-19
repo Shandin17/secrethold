@@ -6,6 +6,7 @@ const { setTimeout: delay } = require('node:timers/promises');
 const { Secrethold, ErrorCodes } = require('..');
 const { decrypt } = require('../lib/cryptography/decrypt');
 const localStorage = require('../lib/local-encrypted-storage');
+const stream = require('node:stream');
 
 const secret = 'secret message';
 const masterKey = crypto.randomBytes(32);
@@ -244,4 +245,99 @@ test('should wrap delete in transaction', async ({ equal }) => {
   );
   await secrethold.delSecret(id, mockedTxClient);
   equal(savedData, null);
+});
+
+test('should encrypt/decrypt stream', async ({ equal }) => {
+  function* charGenerator(char, times) {
+    for (let i = 0; i < times; i++) {
+      yield char;
+    }
+  }
+  const char = 'A';
+  const times = 100;
+  const expectedString = char.repeat(times);
+  const source = stream.Readable.from(charGenerator(char, times));
+
+  // encrypting
+  const { pinTagPromise, masterTagPromise, encryptedStream, iv, pinSalt } =
+    await secrethold.createEncryptionStream({
+      source,
+      pin,
+    });
+  const encryptedBuffs = [];
+  for await (const chunk of encryptedStream) {
+    encryptedBuffs.push(chunk);
+  }
+  const [masterTag, pinTag] = await Promise.all([masterTagPromise, pinTagPromise]);
+  const encryptedSource = stream.Readable.from(Buffer.concat(encryptedBuffs));
+
+  // decrypting
+  const decryptedStream = await secrethold.createDecryptionStream({
+    encryptedSource,
+    pin,
+    pinSalt,
+    iv,
+    masterTag,
+    pinTag,
+  });
+  const decryptedBuffs = [];
+  for await (const chunk of decryptedStream) {
+    decryptedBuffs.push(chunk);
+  }
+  const decryptedData = Buffer.concat(decryptedBuffs).toString();
+  equal(decryptedData, expectedString);
+
+  // decrypting with buffers
+  const encryptedSource2 = stream.Readable.from(Buffer.concat(encryptedBuffs));
+  const decryptedStream2 = await secrethold.createDecryptionStream({
+    encryptedSource: encryptedSource2,
+    pin,
+    pinSalt: Buffer.from(pinSalt, encryptedDataEncoding),
+    iv: Buffer.from(iv, encryptedDataEncoding),
+    masterTag: Buffer.from(masterTag, encryptedDataEncoding),
+    pinTag: Buffer.from(pinTag, encryptedDataEncoding),
+  });
+  const decryptedBuffs2 = [];
+  for await (const chunk of decryptedStream2) {
+    decryptedBuffs2.push(chunk);
+  }
+  const decryptedData2 = Buffer.concat(decryptedBuffs2).toString();
+  equal(decryptedData2, expectedString);
+});
+
+test('decrypting stream should throw if wrong pin provided', async ({ rejects }) => {
+  const source = stream.Readable.from('secret message');
+  // encrypting
+  const { pinTagPromise, masterTagPromise, encryptedStream, iv, pinSalt } =
+    await secrethold.createEncryptionStream({
+      source,
+      pin,
+    });
+  const encryptedBuffs = [];
+  for await (const chunk of encryptedStream) {
+    encryptedBuffs.push(chunk);
+  }
+  const [masterTag, pinTag] = await Promise.all([masterTagPromise, pinTagPromise]);
+  const encryptedSource = stream.Readable.from(Buffer.concat(encryptedBuffs));
+
+  // decrypting
+  const decryptedStream = await secrethold.createDecryptionStream({
+    encryptedSource,
+    pin: 'wrong_pin',
+    pinSalt,
+    iv,
+    masterTag,
+    pinTag,
+  });
+  async function readStream(stream) {
+    const buffs = [];
+    for await (const chunk of stream) {
+      buffs.push(chunk);
+    }
+    return Buffer.concat(buffs).toString();
+  }
+
+  await rejects(readStream(decryptedStream), {
+    message: 'Unsupported state or unable to authenticate data',
+  });
 });
