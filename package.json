@@ -35,8 +35,5 @@
     "prettier": "^3.2.5",
     "tap": "^18.7.0",
     "typescript": "^5.3.3"
-  },
-  "dependencies": {
-    "metautil": "^5.2.0"
   }
 }
