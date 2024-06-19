@@ -265,7 +265,7 @@ prismaClient
 
 <a name="secrethold-prisma-tx"></a>
 
-### Wrapping into transaction
+### Wrapping into transaction with prisma
 
 ```javascript
 'use strict';
