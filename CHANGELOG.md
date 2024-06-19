@@ -2,6 +2,10 @@
 
 ## [Unreleased][unreleased]
 
+## [2.1.0][] - 2024-06-19
+
+- cache removed. Now `Secrehold` always reads data from persistent encrypted storage
+
 ## [2.0.0][] - 2024-06-19
 
 - crypto algorithm changed to `aes-256-gcm`. Data authentication is now performed

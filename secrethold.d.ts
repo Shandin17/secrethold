@@ -4,16 +4,6 @@ export type AesSalt = string;
 export type MasterTag = string;
 export type PinTag = string;
 export type EncryptedData = `${PinSalt}:${AesSalt}:${MasterTag}:${PinTag}:${string}`;
-export type CacheKey = string | Buffer;
-export type CacheValue = string | Buffer | number;
-
-export interface Cache {
-  get: (key: CacheKey) => Promise<CacheValue | null>;
-  set: (key: CacheKey, val: CacheValue, ms?: number) => Promise<void>;
-  buildKey: (...args: CacheKey[]) => CacheKey;
-  cached: (key: CacheKey) => Promise<boolean>;
-  del: (key: CacheKey) => Promise<void>;
-}
 
 export interface EncryptedStorage {
   getEncryptedData: (id: Id) => Promise<EncryptedData | null>;
@@ -36,8 +26,6 @@ export interface ChangePinOptions {
 export interface SecretholdOptions<T> {
   masterKey: Buffer;
   encryptedStorage?: EncryptedStorage;
-  cache?: Cache;
-  cacheTimeMs?: number;
   secretWrapper?: (secret: string) => Promise<T> | T;
   secretEncoding?: BufferEncoding;
   encryptedDataEncoding?: BufferEncoding;
@@ -48,9 +36,6 @@ export class Secrethold<T = string> {
   getSecret(id: Id, pin: string): Promise<T | null>;
   changePin(changePinOptions: ChangePinOptions, tx?: unknown | null): Promise<void>;
   setSecret(setSecretOptions: SetSecretOptions, tx?: unknown | null): Promise<void>;
-  cleanCache(): Promise<void>;
-  deleteCachedSecret(id: Id): Promise<void>;
-  cached(id: Id): Promise<boolean>;
   delSecret(id: Id, tx?: unknown | null): Promise<void>;
 }
 

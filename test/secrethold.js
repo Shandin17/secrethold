@@ -6,22 +6,18 @@ const { setTimeout: delay } = require('node:timers/promises');
 const { Secrethold, ErrorCodes } = require('..');
 const { decrypt } = require('../lib/cryptography/decrypt');
 const localStorage = require('../lib/local-encrypted-storage');
-const localCache = require('../lib/local-cache');
 
 const secret = 'secret message';
 const masterKey = crypto.randomBytes(32);
 const id = 12345678;
 const pin = '123456abcdef';
 
-const cache = localCache();
 const encryptedStorage = localStorage();
 const secretEncoding = 'utf8';
 const encryptedDataEncoding = 'base64url';
 
 const secrethold = new Secrethold({
   masterKey,
-  cacheTimeMs: 0,
-  cache,
   encryptedStorage,
   secretEncoding,
   encryptedDataEncoding,
@@ -34,17 +30,6 @@ test('constructor', async (t) => {
 test('should provide set and get methods', async (t) => {
   await secrethold.setSecret({ id, decryptedSecret: secret, pin });
   const saved = await secrethold.getSecret(id, pin);
-  t.ok(await secrethold.cached(id.toString()));
-  t.not(saved, null);
-  t.same(saved, secret);
-});
-
-test('should fetch data from encryptedStorage after cache cleaned', async (t) => {
-  await secrethold.setSecret({ id, decryptedSecret: secret, pin });
-  await delay(1);
-  t.equal(await secrethold.cached(id.toString()), false);
-  const saved = await secrethold.getSecret(id, pin);
-  t.not(saved, null);
   t.same(saved, secret);
 });
 
@@ -133,7 +118,6 @@ test('should return wrapped secret', async ({ same }) => {
   await secretHoldWithWrapper.setSecret({ id, decryptedSecret: secret, pin });
   const wrappedSecret = await secretHoldWithWrapper.getSecret(id, pin);
   same(secretWrapper(secret), wrappedSecret);
-  await secretHoldWithWrapper.cleanCache();
 });
 
 test('should wrap operation into transaction', async ({ equal }) => {
@@ -182,7 +166,6 @@ test('should save objects in different encodings', async ({ equal }) => {
     });
     const secretFromNewPin = await sh.getSecret(id, newPin);
     equal(secretFromNewPin, secretFromKK);
-    await sh.cleanCache();
   }
 });
 
@@ -227,20 +210,6 @@ test('pin can be any utf8 string', async ({ equal }) => {
   equal(secretMessage, received);
 });
 
-test('should clear cached secret', async ({ equal }) => {
-  const secrethold = new Secrethold({
-    masterKey,
-  });
-  await secrethold.setSecret({
-    id,
-    decryptedSecret: secret,
-    pin,
-  });
-  equal(await secrethold.cached(id), true);
-  await secrethold.deleteCachedSecret(id);
-  equal(await secrethold.cached(id), false);
-});
-
 test('should delete secret', async ({ equal }) => {
   const secrethold = new Secrethold({
     masterKey,
@@ -251,7 +220,6 @@ test('should delete secret', async ({ equal }) => {
     pin,
   });
   await secrethold.delSecret(id);
-  equal(await secrethold.cached(id), false);
   equal(await secrethold.getSecret(id, pin), null);
 });
 
