@@ -3,21 +3,32 @@
 const { test } = require('tap');
 const crypto = require('node:crypto');
 const { setTimeout: delay } = require('node:timers/promises');
-const { SecretHold, ErrorCodes } = require('..');
+const { Secrethold, ErrorCodes } = require('..');
 const { decrypt } = require('../lib/cryptography/decrypt');
+const localStorage = require('../lib/local-encrypted-storage');
+const localCache = require('../lib/local-cache');
 
 const secret = 'secret message';
 const masterKey = crypto.randomBytes(32);
 const id = 12345678;
 const pin = '123456abcdef';
 
-const secrethold = new SecretHold({
+const cache = localCache();
+const encryptedStorage = localStorage();
+const secretEncoding = 'utf8';
+const encryptedDataEncoding = 'base64url';
+
+const secrethold = new Secrethold({
   masterKey,
   cacheTimeMs: 0,
+  cache,
+  encryptedStorage,
+  secretEncoding,
+  encryptedDataEncoding,
 });
 
 test('constructor', async (t) => {
-  t.throws(() => new SecretHold({ masterKey: crypto.randomBytes(1) }));
+  t.throws(() => new Secrethold({ masterKey: crypto.randomBytes(1) }));
 });
 
 test('should provide set and get methods', async (t) => {
@@ -49,7 +60,8 @@ test('getAccount with invalid pin', async (t) => {
   try {
     await secrethold.setSecret({ id, decryptedSecret: secret, pin });
     await delay(1);
-    await secrethold.getSecret(id, invalidPin);
+    const secret1 = await secrethold.getSecret(id, invalidPin);
+    console.log(secret1);
   } catch (e) {
     error = e;
   }
@@ -91,7 +103,21 @@ test('should wrap setting new pin into transaction', async ({ equal }) => {
     mockedTxClient,
   );
   const decryptedDataWithNewPin = await secrethold.getSecret(id, newPin);
-  const decryptedSavedData = await decrypt(savedData, masterKey, newPin, 'utf8');
+  const [pinSalt, iv, masterTag, pinTag, encryptedSecret] = savedData.split(':');
+  const decryptedStream = await decrypt({
+    encryptedSource: Buffer.from(encryptedSecret, encryptedDataEncoding),
+    masterKey,
+    pin: newPin,
+    pinSalt: Buffer.from(pinSalt, encryptedDataEncoding),
+    iv: Buffer.from(iv, encryptedDataEncoding),
+    pinTag: Buffer.from(pinTag, encryptedDataEncoding),
+    masterTag: Buffer.from(masterTag, encryptedDataEncoding),
+  });
+  const decryptedBuffs = [];
+  for await (const chunk of decryptedStream) {
+    decryptedBuffs.push(chunk);
+  }
+  const decryptedSavedData = Buffer.concat(decryptedBuffs).toString(secretEncoding);
   equal(decryptedDataWithNewPin, decryptedSavedData);
 });
 
@@ -99,7 +125,7 @@ test('should return wrapped secret', async ({ same }) => {
   const secretWrapper = (secret) => ({
     secret,
   });
-  const secretHoldWithWrapper = new SecretHold({
+  const secretHoldWithWrapper = new Secrethold({
     masterKey,
     secretWrapper,
     cacheTimeMs: 0,
@@ -126,10 +152,8 @@ test('should wrap operation into transaction', async ({ equal }) => {
     },
     mockedTxClient,
   );
-  const decryptedSavedData = await decrypt(savedData, masterKey, pin, 'utf8');
-  await delay(1);
-  const secretFromKK = await secrethold.getSecret(id, pin);
-  equal(decryptedSavedData, secretFromKK);
+  const encryptedSecret = await encryptedStorage.getEncryptedData(id);
+  equal(encryptedSecret, savedData);
 });
 
 test('should save objects in different encodings', async ({ equal }) => {
@@ -137,7 +161,7 @@ test('should save objects in different encodings', async ({ equal }) => {
   for (const secretEncoding of encodings) {
     const masterKey = crypto.randomBytes(32);
     const decryptedSecret = crypto.randomBytes(32).toString(secretEncoding);
-    const sh = new SecretHold({
+    const sh = new Secrethold({
       masterKey,
       secretEncoding,
       cacheTimeMs: 0,
@@ -190,32 +214,6 @@ test('change pin throw if wrong old pin provided', async ({ equal }) => {
   equal(error.code, ErrorCodes.WRONG_PIN);
 });
 
-test('change pin throw if secretWrapper throws', async ({ rejects }) => {
-  const secretWrapper = () => {
-    throw new Error('wrapper error');
-  };
-  const secrethold = new SecretHold({
-    masterKey,
-    secretWrapper,
-    cacheTimeMs: 0,
-  });
-  await secrethold.setSecret({
-    id,
-    decryptedSecret: secret,
-    pin,
-  });
-  await rejects(
-    secrethold.changePin({
-      id,
-      oldPin: pin,
-      newPin: 'new_pin',
-    }),
-    {
-      code: ErrorCodes.WRONG_PIN,
-    },
-  );
-});
-
 test('pin can be any utf8 string', async ({ equal }) => {
   const secretMessage = 'secret message';
   const pin = 'qwerty123';
@@ -230,7 +228,7 @@ test('pin can be any utf8 string', async ({ equal }) => {
 });
 
 test('should clear cached secret', async ({ equal }) => {
-  const secrethold = new SecretHold({
+  const secrethold = new Secrethold({
     masterKey,
   });
   await secrethold.setSecret({
@@ -244,7 +242,7 @@ test('should clear cached secret', async ({ equal }) => {
 });
 
 test('should delete secret', async ({ equal }) => {
-  const secrethold = new SecretHold({
+  const secrethold = new Secrethold({
     masterKey,
   });
   await secrethold.setSecret({

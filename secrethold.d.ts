@@ -1,7 +1,9 @@
 export type Id = number | bigint | string;
-export type pinSalt = string;
-export type aesSalt = string;
-export type EncryptedData = `${pinSalt}:${aesSalt}:${string}`;
+export type PinSalt = string;
+export type AesSalt = string;
+export type MasterTag = string;
+export type PinTag = string;
+export type EncryptedData = `${PinSalt}:${AesSalt}:${MasterTag}:${PinTag}:${string}`;
 export type CacheKey = string | Buffer;
 export type CacheValue = string | Buffer | number;
 
@@ -31,17 +33,18 @@ export interface ChangePinOptions {
   newPin: string;
 }
 
-export interface SecretHoldOptions<T> {
+export interface SecretholdOptions<T> {
   masterKey: Buffer;
   encryptedStorage?: EncryptedStorage;
   cache?: Cache;
   cacheTimeMs?: number;
   secretWrapper?: (secret: string) => Promise<T> | T;
-  secretEncoding?: 'utf8' | 'base64' | 'base64url' | 'hex';
+  secretEncoding?: BufferEncoding;
+  encryptedDataEncoding?: BufferEncoding;
 }
 
-export class SecretHold<T = string> {
-  constructor(secretHoldOptions: SecretHoldOptions<T>);
+export class Secrethold<T = string> {
+  constructor(secretholdOptions: SecretholdOptions<T>);
   getSecret(id: Id, pin: string): Promise<T | null>;
   changePin(changePinOptions: ChangePinOptions, tx?: unknown | null): Promise<void>;
   setSecret(setSecretOptions: SetSecretOptions, tx?: unknown | null): Promise<void>;
