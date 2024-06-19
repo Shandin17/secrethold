@@ -190,9 +190,9 @@ encryptDecryptStream().catch(console.error);
 
 <a name="secrethold-prisma"></a>
 
-### Secrethold with prisma
+### Secrethold with [Prisma](https://www.prisma.io/)
 
-you can use `Secrethold` with `Prisma` to store secrets in a database.
+you can use `Secrethold` with [Prisma](https://www.prisma.io/) to store secrets in a database.
 
 ```javascript
 'use strict';
@@ -265,7 +265,7 @@ prismaClient
 
 <a name="secrethold-prisma-tx"></a>
 
-### Wrapping into transaction with prisma
+### Wrapping into transaction with [Prisma](https://www.prisma.io/)
 
 ```javascript
 'use strict';
