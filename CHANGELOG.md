@@ -10,7 +10,7 @@
 
 ## [2.0.0][] - 2024-06-19
 
-- crypto algorithm changed to `aes-256-gcm`. Data authentication is now performed
+- crypto algorithm changed to `aes-256-gcm`. Data authentication is now performed. _WARNING! It is not compatible with v1.\* versions!_
 - `saltLength` changed to `12` bytes
 - `encrypt` and `decrypt` functions are now compatible with streams. This allows for the encryption and decryption of large data sets without consuming excessive memory
 - `SecretHold` name changed to `Secrehold`
