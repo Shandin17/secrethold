@@ -5,14 +5,18 @@
 [![snyk](https://snyk.io/test/github/Shandin17/secrethold/badge.svg)](https://snyk.io/test/github/Shandin17/secrethold)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Shandin17/secrethold/blob/master/LICENSE)
 
-Lightweight Node.js package designed to safeguard secrets. Each secret can be encrypted separately using a unique `pin` and then stored in a persistent storage. Later secrets can be retrieved and decrypted using their `id` and the corresponding `pin`.
+**Node.js Secret Manager**
+
+Lightweight Node.js library designed to store and manage user secrets.
+
+Each secret is individually encrypted using a unique `pin` before being saved to persistent storage. Retrieve and decrypt secrets later using their unique `id` and corresponding `pin`. Ideal for developers who need simple, secure secret management in Node.js applications.
 
 The encryption process involves two stages:
 
-1. Initially, the secret is encrypted with `aes-256-gcm` algorithm, using a key derived from the secret owner's pin via the `pbkdf2` algorithm.
-2. The data is then encrypted again with a `masterKey` provided to the `Secrethold` constructor, using the `aes-256-gcm` algorithm.
+1. Secret is encrypted with a key derived from secret owner's pin.
+2. Data is encrypted again with a `masterKey` provided to the `Secrethold` constructor.
 
-The decision to store the secret owner's pin is left to the implementer. Not storing the pin enhances security, as only the secret owner will have access to their secrets, eliminating concerns about pin security. However, this approach means that if the secret owner forgets their pin, the secret cannot be recovered. Implementers can choose to allow secret owners to reset their pins through alternative methods, such as email or phone number verification, but this functionality must be developed separately.
+The decision to store the secret owner's pin is left to developer. Not storing pin enhances security, as only the secret owner will have access to their secrets. However, this approach means that secret cannot be recovered in case of losing pin.
 
 A "secret owner" refers to any entity (such as a service, user, or other) that possesses a secret.
 
