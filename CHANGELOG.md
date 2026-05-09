@@ -2,6 +2,11 @@
 
 ## [Unreleased][unreleased]
 
+## [2.2.0][] - 2025-05-22
+
+- Depenencies updated
+- Node.js 22, 23, 24 added to CI
+
 ## [2.1.0][] - 2024-06-19
 
 - cache removed. Now `Secrethold` always reads data from persistent encrypted storage
