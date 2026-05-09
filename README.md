@@ -1,5 +1,6 @@
 # Secrethold
 
+![Made by Human](https://img.shields.io/badge/Made%20by-Human%20%F0%9F%91%A4-blue)
 [![NPM version](https://img.shields.io/npm/v/secrethold.svg?style=flat)](https://www.npmjs.com/package/secrethold)
 [![ci status](https://github.com/Shandin17/secrethold/workflows/Testing%20CI/badge.svg)](https://github.com/Shandin17/secrethold/actions/workflows/test.yml)
 [![snyk](https://snyk.io/test/github/Shandin17/secrethold/badge.svg)](https://snyk.io/test/github/Shandin17/secrethold)
